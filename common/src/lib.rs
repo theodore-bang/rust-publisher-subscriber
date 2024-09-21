@@ -1,3 +1,4 @@
+use std::{io, net::TcpStream};
 use serde::{Deserialize, Serialize};
 
 pub const ADDR: &str = "127.0.0.1:5550";
@@ -28,6 +29,10 @@ pub enum Procedures {
     CreateTopic,
     DeleteTopic,
     Send
+}
+
+pub fn try_connect() -> Result<TcpStream, std::io::Error> {
+    TcpStream::connect(ADDR)
 }
 
 pub fn add(left: u64, right: u64) -> u64 {

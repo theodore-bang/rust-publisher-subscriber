@@ -1,10 +1,12 @@
 use common;
 use std::{io::{self, BufRead, BufReader, Read, Write}, net::TcpStream};
+use sub_api;
 
 // use sub_api;
 use serde_json::Result;
 
 fn main() -> io::Result<()> {
+    /* 
     // Connect to the server
     let mut stream = TcpStream::connect("127.0.0.1:7878")?;
     
@@ -24,6 +26,9 @@ fn main() -> io::Result<()> {
     let reader = BufReader::new(&stream);
     let response: String = reader.lines().next().unwrap().unwrap();
     
+    */
+
+    let response = sub_api::register_subscriber().unwrap();
     println!("Received from server: {}", response);
 
     Ok(())

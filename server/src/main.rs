@@ -5,7 +5,7 @@ use std::net::{TcpListener, TcpStream};
 use std::thread;
 use serde_json;
 
-fn handle_client(mut stream: TcpStream) -> io::Result<()> {
+fn handle_client(server_data: &mut ServerData, mut stream: TcpStream) -> io::Result<()> {
     let mut buffer = [0; 512];
     
     // Read data from the client
@@ -15,24 +15,55 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
     let received = serde_json::from_slice::<Stub>(&buffer[..bytes_read]).unwrap();
     println!("Received: {:?}", received);
 
+    let response = server_data.register_sid();
+
     // Prepare and send a response back to the client
-    let response = "Message received";
+    let response = serde_json::to_string(&response).unwrap();
     stream.write_all(response.as_bytes())?;
     
     Ok(())
 }
 
+struct ServerData {
+    sid_generator: Sid,
+    sub_list: Vec<Sid>,
+}
+
+impl ServerData {
+    pub fn new() -> Self {
+        Self {
+            sid_generator: 0,
+            sub_list: Vec::new(),
+        }
+    }
+
+    pub fn check_sid(&self, sid: Sid) -> bool {
+        self.sub_list.contains(&sid)
+    }
+
+    pub fn register_sid(&mut self) -> Sid {
+        self.sid_generator += 1;
+        self.sub_list.push(self.sid_generator);
+        self.sid_generator.clone()
+    }
+
+
+
+}
+
 fn main() -> io::Result<()> {
     // Bind the server to a local address and port
-    let listener = TcpListener::bind("127.0.0.1:7878")?;
-    println!("Server listening on port 7878");
+    let listener = TcpListener::bind(ADDR)?;
+    println!("Server listening on  {}", ADDR);
+
+    let mut server_data = ServerData::new();
 
     // Accept connections in a loop
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
                 println!("New client connected!");
-                handle_client(stream)?;
+                handle_client(&mut server_data, stream)?;
             }
             Err(e) => {
                 eprintln!("Connection failed: {}", e);

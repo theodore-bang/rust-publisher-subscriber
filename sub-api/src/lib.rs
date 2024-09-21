@@ -1,7 +1,34 @@
+
+use std::{io::{self, BufRead, BufReader, Read, Write}, net::TcpStream};
 use common::{Sid, Messages, Stub, Procedures};
+use common::{try_connect};
+
 
 pub fn register_subscriber() -> Option<Sid> {
-    todo!()
+    let mut stream = try_connect().unwrap();
+
+    let rpc = common::Stub {
+        id: None,
+        procedure: common::Procedures::RegisterSubscriber,
+        args: None,
+    };
+
+    // Prepare the message to send //
+    let message = serde_json::to_string(&rpc).unwrap();
+    
+    // Send the message //
+    let Ok(_) = stream.write_all(message.as_bytes()) else {return None};
+    
+    // Read //
+    /* 
+    let reader = BufReader::new(&stream);
+    let response: String = reader.lines().next().unwrap().unwrap();
+    */
+
+    let reader = BufReader::new(&stream);
+    let response: u64 = serde_json::from_reader(reader).unwrap();
+
+    Some(response)
 }
 
 pub fn subscribe(sid: Sid, topic: String) {
