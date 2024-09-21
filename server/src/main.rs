@@ -12,8 +12,8 @@ fn handle_client(mut stream: TcpStream) -> io::Result<()> {
     let bytes_read = stream.read(&mut buffer)?;
     
     // Convert bytes to a string
-    let received = String::from_utf8_lossy(&buffer[..bytes_read]);
-    println!("Received: {}", received);
+    let received = serde_json::from_slice::<Stub>(&buffer[..bytes_read]).unwrap();
+    println!("Received: {:?}", received);
 
     // Prepare and send a response back to the client
     let response = "Message received";
