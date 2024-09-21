@@ -4,7 +4,9 @@ members = [
 	"common",
 	"server",
 	"publisher",
+	"pub-api",
 	"subscriber",
+	"sub-api",
 ]
 
 resolver = "2"

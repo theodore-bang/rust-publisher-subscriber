@@ -7,13 +7,32 @@ name = "common"
 version = "0.1.0"
 
 [[package]]
-name = "publisher"
+name = "pub-api"
 version = "0.1.0"
 
 [[package]]
+name = "publisher"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "pub-api",
+]
+
+[[package]]
 name = "server"
+version = "0.1.0"
+dependencies = [
+ "common",
+]
+
+[[package]]
+name = "sub-api"
 version = "0.1.0"
 
 [[package]]
 name = "subscriber"
 version = "0.1.0"
+dependencies = [
+ "common",
+ "sub-api",
+]
