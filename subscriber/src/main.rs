@@ -1,32 +1,25 @@
-use common;
-use std::{io::{Read, Write}, net::TcpStream};
+use common::Message;
+use std::{io::{self, BufRead, BufReader, Read, Write}, net::TcpStream};
 
 // use sub_api;
+use serde_json::Result;
 
-fn main() -> Result<(), anyhow::Error> {
-    let mut stream = TcpStream::connect(common::ADDR)?;
+fn main() -> io::Result<()> {
+    // Connect to the server
+    let mut stream = TcpStream::connect("127.0.0.1:7878")?;
     
-    // Create a message
-    let message = common::Message {
-        content: "Hello from client".to_string(),
-        id: 1,
-    };
-
-    // Serialize the message to JSON
-    let message_json = serde_json::to_string(&message).unwrap();
+    // Prepare the message to send
+    let message = "Hello from client!";
     
-    println!("Sending request...");
     // Send the message
-    stream.write_all(message_json.as_bytes()).unwrap();
+    stream.write_all(message.as_bytes())?;
 
-    // Wait for the server's response
-    println!("Waiting for response...");
-    let mut buffer = [0; 512];
-    stream.read(&mut buffer).unwrap();
-
-    // Deserialize the response from the server
-    let response: common::Message = serde_json::from_str(&String::from_utf8_lossy(&buffer)).unwrap();
-    println!("Received from server: {:?}", response);
+    // Read the response from the server
+    let reader = BufReader::new(&stream);
+    let response: String = reader.lines().next().unwrap().unwrap();
+    
+    println!("Received from server: {}", response);
 
     Ok(())
 }
+
