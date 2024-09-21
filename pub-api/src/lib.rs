@@ -1,7 +1,27 @@
-use common::Pid;
+use std::io::{BufReader, Write};
+
+use common::{try_connect, Pid};
+use serde_json;
 
 pub fn register_publisher() -> Option<Pid> {
-    todo!()
+    let mut stream = try_connect().unwrap();
+
+    let rpc = common::Stub {
+        id: None,
+        procedure: common::Procedures::RegisterPublisher,
+        args: None,
+    };
+
+    // Prepare the message to send //
+    let message = serde_json::to_string(&rpc).unwrap();
+    
+    // Send the message //
+    let Ok(_) = stream.write_all(message.as_bytes()) else {return None};
+
+    let reader = BufReader::new(&stream);
+    let response: Pid = serde_json::from_reader(reader).unwrap();
+
+    Some(response)
 }
 
 pub fn create_topic(pid: Pid, topic: String) {

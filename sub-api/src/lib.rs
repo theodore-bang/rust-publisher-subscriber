@@ -18,15 +18,9 @@ pub fn register_subscriber() -> Option<Sid> {
     
     // Send the message //
     let Ok(_) = stream.write_all(message.as_bytes()) else {return None};
-    
-    // Read //
-    /* 
-    let reader = BufReader::new(&stream);
-    let response: String = reader.lines().next().unwrap().unwrap();
-    */
 
     let reader = BufReader::new(&stream);
-    let response: u64 = serde_json::from_reader(reader).unwrap();
+    let response: Sid = serde_json::from_reader(reader).unwrap();
 
     Some(response)
 }
