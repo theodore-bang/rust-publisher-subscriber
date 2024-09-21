@@ -1,25 +1,32 @@
-use sub_api;
+use common;
+use std::{io::{Read, Write}, net::TcpStream};
 
-#[tokio::main]
-async fn main() -> Result<(), anyhow::Error> {
-    let sid = sub_api::register_subscriber().await.unwrap();
-    println!("{sid}");
-    Ok(())    
-}
-/*
-fn echo() {
-    let mut stream = TcpStream::connect(common::ADDR).await?;
+// use sub_api;
 
-    let (mut reader, mut writer) = stream.split();
+fn main() -> Result<(), anyhow::Error> {
+    let mut stream = TcpStream::connect(common::ADDR)?;
+    
+    // Create a message
+    let message = common::Message {
+        content: "Hello from client".to_string(),
+        id: 1,
+    };
 
-    writer.write_all(b"Hello Mr. Server").await?;
+    // Serialize the message to JSON
+    let message_json = serde_json::to_string(&message).unwrap();
+    
+    println!("Sending request...");
+    // Send the message
+    stream.write_all(message_json.as_bytes()).unwrap();
 
-    let mut buf = [0; 1024];
+    // Wait for the server's response
+    println!("Waiting for response...");
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
 
-    let n = reader.read(&mut buf).await?;
-
-    println!("Received: {}", String::from_utf8_lossy(&buf[..n]));
+    // Deserialize the response from the server
+    let response: common::Message = serde_json::from_str(&String::from_utf8_lossy(&buffer)).unwrap();
+    println!("Received from server: {:?}", response);
 
     Ok(())
 }
-*/
