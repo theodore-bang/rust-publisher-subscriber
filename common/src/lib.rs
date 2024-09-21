@@ -1,3 +1,29 @@
+use serde::{Deserialize, Serialize};
+
+pub const ADDR: &str = "127.0.0.1:5550";
+
+pub type Pid = u64;
+pub type Sid = u64;
+pub type Messages = Vec<String>;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Stub {
+    pub id: Option<u64>,
+    pub procedure: Procedures,
+    pub args: Option<Vec<String>>,
+}
+
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+pub enum Procedures {
+    RegisterSubscriber,
+    Subscribe,
+    Pull,
+    RegisterPublisher,
+    CreateTopic,
+    DeleteTopic,
+    Send
+}
+
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
 }

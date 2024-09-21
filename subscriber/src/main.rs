@@ -1,6 +1,25 @@
-use common;
 use sub_api;
 
-fn main() {
-    println!("I am a subscriber! {}", sub_api::add(400, 20));
+#[tokio::main]
+async fn main() -> Result<(), anyhow::Error> {
+    let sid = sub_api::register_subscriber().await.unwrap();
+    println!("{sid}");
+    Ok(())    
 }
+/*
+fn echo() {
+    let mut stream = TcpStream::connect(common::ADDR).await?;
+
+    let (mut reader, mut writer) = stream.split();
+
+    writer.write_all(b"Hello Mr. Server").await?;
+
+    let mut buf = [0; 1024];
+
+    let n = reader.read(&mut buf).await?;
+
+    println!("Received: {}", String::from_utf8_lossy(&buf[..n]));
+
+    Ok(())
+}
+*/
