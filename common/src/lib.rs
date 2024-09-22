@@ -14,11 +14,13 @@ pub struct Stub {
     pub args: Option<Vec<String>>,
 }
 
+/*
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Message {
     pub content: String,
     pub id: u32,
 }
+*/
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub enum Procedures {

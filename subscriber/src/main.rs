@@ -7,8 +7,9 @@ use serde_json::Result;
 
 fn main() -> io::Result<()> {
 
-    let response = sub_api::register_subscriber().unwrap();
-    println!("Received from server: {}", response);
+    if let Ok(response) = sub_api::Subscriber::register_subscriber() {
+        println!("Received from server: {}", response.sid);
+    }
 
     Ok(())
 }
