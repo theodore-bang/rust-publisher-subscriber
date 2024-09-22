@@ -3,44 +3,35 @@ use std::{io::{self, BufRead, BufReader, Read, Write}, net::TcpStream};
 use common::{Sid, Messages, Stub, Procedures};
 use common::{try_connect};
 
-pub struct Subscriber {
-    pub sid: Sid,
-    stream: TcpStream,
+
+pub fn register_subscriber() -> Result<Sid, String> {
+    let mut stream = try_connect().unwrap();
+
+    let rpc = common::Stub {
+        id: None,
+        procedure: common::Procedures::RegisterSubscriber,
+        args: None,
+    };
+
+    // Prepare the message to send //
+    let message = serde_json::to_string(&rpc).unwrap();
+    
+    // Send the message //
+    let Ok(_) = stream.write_all(message.as_bytes()) 
+    else { return Err("Failed to connect".to_string()); };
+
+    let reader = BufReader::new(&stream);
+    let new_sid: Sid = serde_json::from_reader(reader).unwrap();
+
+    Ok(new_sid)
 }
 
-impl Subscriber {
-    pub fn register_subscriber() -> Result<Self, String> {
-        let mut stream = try_connect().unwrap();
+pub fn subscribe(sid: Sid, topic: String) {
+    todo!()
+}
 
-        let rpc = common::Stub {
-            id: None,
-            procedure: common::Procedures::RegisterSubscriber,
-            args: None,
-        };
-
-        // Prepare the message to send //
-        let message = serde_json::to_string(&rpc).unwrap();
-        
-        // Send the message //
-        let Ok(_) = stream.write_all(message.as_bytes()) 
-        else { return Err("Failed to connect".to_string()); };
-
-        let reader = BufReader::new(&stream);
-        let response: Sid = serde_json::from_reader(reader).unwrap();
-
-        Ok(Self {
-            sid: response,
-            stream: stream,
-        })
-    }
-
-    pub fn subscribe(sid: Sid, topic: String) {
-        todo!()
-    }
-
-    pub fn pull(sid: Sid, topic: String) -> Messages {
-        todo!()
-    }
+pub fn pull(sid: Sid, topic: String) -> Messages {
+    todo!()
 }
 
 pub fn add(left: u64, right: u64) -> u64 {

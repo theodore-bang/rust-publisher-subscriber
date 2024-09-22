@@ -2,5 +2,6 @@ use common;
 use pub_api;
 
 fn main() {
-    println!("Hi, I am a publisher! {}", pub_api::add(1037, 300));
+    let my_pid = pub_api::register_publisher().unwrap();
+    pub_api::create_topic(my_pid, "FooBar".to_string());
 }

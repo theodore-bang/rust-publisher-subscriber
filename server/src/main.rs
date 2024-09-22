@@ -33,6 +33,11 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
             // Prepare and send a response back to the client
             let response = serde_json::to_string(&response).unwrap();
             stream.write_all(response.as_bytes())?;
+        },
+        Procedures::CreateTopic => {
+            let pid = received.id.unwrap();
+            let topic_name = received.args.unwrap()[0].clone();
+            server_data.write().unwrap().create_topic(pid, topic_name);
         }
         _ => (),
     }
@@ -53,7 +58,7 @@ fn main() -> io::Result<()> {
         let ref_to_server = Arc::clone(&server_data);
         match stream {
             Ok(stream) => {
-                println!("New client connected!");
+                println!("New client connection!");
                 thread::spawn(move || handle_client(ref_to_server, stream));
             }
             Err(e) => {

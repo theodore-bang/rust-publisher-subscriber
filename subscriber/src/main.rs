@@ -5,12 +5,10 @@ use sub_api;
 // use sub_api;
 use serde_json::Result;
 
-fn main() -> io::Result<()> {
+// fn main() -> io::Result<()> {
+fn main() {
 
-    if let Ok(response) = sub_api::Subscriber::register_subscriber() {
-        println!("Received from server: {}", response.sid);
-    }
+    let my_sid = sub_api::register_subscriber().unwrap();
 
-    Ok(())
 }
 

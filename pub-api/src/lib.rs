@@ -25,7 +25,27 @@ pub fn register_publisher() -> Option<Pid> {
 }
 
 pub fn create_topic(pid: Pid, topic: String) {
-    todo!()
+    let mut stream = try_connect().unwrap();
+
+    let rpc = common::Stub {
+        id: Some(pid),
+        procedure: common::Procedures::CreateTopic,
+        args: Some(vec![topic.clone()]),
+    };
+
+    // Prepare the message to send //
+    let message = serde_json::to_string(&rpc).unwrap();
+    
+    // Send the message //
+    let _ = stream.write_all(message.as_bytes());
+
+    // We don't expect a response //
+    /*
+    let reader = BufReader::new(&stream);
+    let response: Pid = serde_json::from_reader(reader).unwrap();
+
+    Some(response)
+    */
 }
 
 pub fn delete_topic(pid: Pid, topic: String) {

@@ -50,6 +50,7 @@ impl Broker {
         };
 
         self.topics.insert(topic_name.clone(), new_topic);
+        println!("Created topic: {}", topic_name);
     }
 
     pub fn delete_topic(&mut self, pid: Pid, topic_name: String) {
