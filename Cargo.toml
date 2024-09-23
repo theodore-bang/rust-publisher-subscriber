@@ -3,9 +3,8 @@
 members = [
 	"common",
 	"server",
-	"publisher",
+	"clients",
 	"pub-api",
-	"subscriber",
 	"sub-api",
 ]
 

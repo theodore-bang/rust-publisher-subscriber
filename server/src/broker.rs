@@ -31,13 +31,13 @@ impl Broker {
     pub fn register_sub(&mut self) -> Sid {
         self.sid_generator += 1;
         self.sub_list.push(self.sid_generator);
-        println!("Registering SID: {}", self.sid_generator);
+        println!("Server: registering SID {}", self.sid_generator);
         self.sid_generator.clone()
     }
     pub fn register_pub(&mut self) -> Pid {
         self.pid_generator += 1;
         self.pub_list.push(self.pid_generator);
-        println!("Registering PID: {}", self.pid_generator);
+        println!("Server: registering PID {}", self.pid_generator);
         self.pid_generator.clone()
     }
 
@@ -50,7 +50,7 @@ impl Broker {
         };
 
         self.topics.insert(topic_name.clone(), new_topic);
-        println!("Created topic: {}", topic_name);
+        println!("Server: created topic \"{}\"", topic_name);
     }
 
     pub fn delete_topic(&mut self, pid: Pid, topic_name: String) {
@@ -58,14 +58,14 @@ impl Broker {
 
         if found.publisher == pid {
             self.topics.remove(&topic_name);
+            println!("Server: deleted topic \"{}\"", topic_name);
         }
-        println!("Deleted topic: {}", topic_name);
     }
 
     pub fn add_message(&mut self, topic_name: String, content: String) {
-        let Some(found) = self.topics.get_mut(&topic_name) else {return ()};
-        found.new_message(content);
-        println!("Added message to topic: {}", topic_name);
+        let Some(topic) = self.topics.get_mut(&topic_name) else {return ()};
+        topic.new_message(content);
+        println!("Server: added message to topic: {}", topic_name);
     }
 
     pub fn subscribe(&mut self, sid: Sid, topic_name: String) {
@@ -76,10 +76,10 @@ impl Broker {
     pub fn pull(&mut self, sid: Sid, topic_name: String) -> Vec<String> {
         // println!("Pulling \"{}\" messages for {}", topic_name, sid);
         if let Some(topic) = self.topics.get_mut(&topic_name) {
-            println!("Found topic");
+            println!("Server: pulling {} messages for {sid}", &topic.topic_name);
             return topic.get_messages(sid);
         } else {
-            println!("Failed to find topic");
+            println!("Server: failed to find topic");
             vec![]
         }
     }

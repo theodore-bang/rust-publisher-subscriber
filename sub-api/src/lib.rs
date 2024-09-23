@@ -1,16 +1,15 @@
 
-use std::{io::{self, BufRead, BufReader, Read, Write}, net::TcpStream};
-use common::{Sid, Messages, Stub, Procedures};
-use common::{try_connect};
-use tokio::stream;
+use std::io::{BufReader, Write};
+use std::net::TcpStream;
+use common::{Sid, Messages, Stub, Procedures, try_connect};
 
 
 pub fn register_subscriber() -> Result<Sid, String> {
-    let mut stream = try_connect().unwrap();
+    let mut stream: TcpStream = try_connect().unwrap();
 
-    let rpc = common::Stub {
+    let rpc = Stub {
         id: 0,
-        procedure: common::Procedures::RegisterSubscriber,
+        procedure: Procedures::RegisterSubscriber,
         args: vec![],
     };
 
@@ -30,9 +29,9 @@ pub fn register_subscriber() -> Result<Sid, String> {
 pub fn subscribe(sid: Sid, topic: String) {
     let mut stream = try_connect().unwrap();
 
-    let rpc = common::Stub {
+    let rpc = Stub {
         id: sid,
-        procedure: common::Procedures::Subscribe,
+        procedure: Procedures::Subscribe,
         args: vec![topic.clone()]
     };
 
@@ -48,9 +47,9 @@ pub fn subscribe(sid: Sid, topic: String) {
 pub fn pull(sid: Sid, topic: String) -> Messages {
     let mut stream = try_connect().unwrap();
 
-    let rpc = common::Stub {
+    let rpc = Stub {
         id: sid,
-        procedure: common::Procedures::Pull,
+        procedure: Procedures::Pull,
         args: vec![topic],
     };
 
@@ -65,19 +64,4 @@ pub fn pull(sid: Sid, topic: String) -> Messages {
     let messages: Vec<String> = serde_json::from_reader(reader).unwrap();
 
     messages
-}
-
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 }

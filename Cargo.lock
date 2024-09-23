@@ -63,6 +63,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "clients"
+version = "0.1.0"
+dependencies = [
+ "common",
+ "pub-api",
+ "sub-api",
+]
+
+[[package]]
 name = "common"
 version = "0.1.0"
 dependencies = [
@@ -188,15 +197,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "publisher"
-version = "0.1.0"
-dependencies = [
- "common",
- "pub-api",
- "sub-api",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -307,18 +307,6 @@ dependencies = [
  "common",
  "serde",
  "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "subscriber"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "common",
- "serde",
- "serde_json",
- "sub-api",
  "tokio",
 ]
 

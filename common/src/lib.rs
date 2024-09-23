@@ -1,4 +1,4 @@
-use std::{io, net::TcpStream};
+use std::net::TcpStream;
 use serde::{Deserialize, Serialize};
 
 pub const ADDR: &str = "127.0.0.1:5550";

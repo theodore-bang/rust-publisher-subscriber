@@ -16,7 +16,7 @@ use crate::broker::Broker;
 fn main() -> io::Result<()> {
     // Bind the server to a local address and port //
     let listener = TcpListener::bind(ADDR)?;
-    println!("Server listening at {}", ADDR);
+    println!("Server: listening at {}", ADDR);
 
     // Wrap Broker object in RwMutex and Arc Pointer //
     /* 
@@ -37,7 +37,7 @@ fn main() -> io::Result<()> {
                 thread::spawn(move || handle_client(ref_to_server, stream));
             }
             Err(e) => {
-                eprintln!("Connection failed: {}", e);
+                eprintln!("Server: connection failed: {}", e);
             }
         }
     }
@@ -47,7 +47,7 @@ fn main() -> io::Result<()> {
     // for some reason, the following message will play before
     // shutting down the server.
     */
-    println!("Server unexpectedly stopped listening!");
+    println!("Server: unexpectedly stopped listening");
     Ok(())
 }
 
@@ -62,7 +62,7 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
     
     // Deserialize the bytes back into a Stub //
     let received = serde_json::from_slice::<Stub>(&buffer[..bytes_read]).unwrap();
-    println!("Received: {:?}", received);
+    println!("Server: received request \"{:?}\"", received);
 
     // Handle client's request //
     /*
@@ -71,18 +71,18 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
      */
     match received.procedure {
         Procedures::RegisterSubscriber => {
-            let response = server_data.write().unwrap().register_sub();
+            let new_sid = server_data.write().unwrap().register_sub();
 
-            // Prepare and send a response back to the client //
-            let response = serde_json::to_string(&response).unwrap();
-            stream.write_all(response.as_bytes())?;
+            // Send SID back to the client //
+            let response = serde_json::to_string(&new_sid).unwrap();
+            let _ = stream.write_all(response.as_bytes());
         },
         Procedures::RegisterPublisher => {
-            let response = server_data.write().unwrap().register_pub();
+            let new_pid = server_data.write().unwrap().register_pub();
 
-            // Prepare and send a response back to the client //
-            let response = serde_json::to_string(&response).unwrap();
-            stream.write_all(response.as_bytes())?;
+            // Send PID back to the client //
+            let response = serde_json::to_string(&new_pid).unwrap();
+            let _ = stream.write_all(response.as_bytes());
         },
         Procedures::CreateTopic => {
             let pid = received.id;
@@ -114,7 +114,6 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
             let response = serde_json::to_string(&all_msgs).unwrap();
             stream.write_all(response.as_bytes())?;
         }
-        _ => (),
     }
     
     Ok(())

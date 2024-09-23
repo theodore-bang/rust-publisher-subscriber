@@ -6,7 +6,6 @@ fn main() {
 
     let topic1 = "My First Topic".to_string();
     let topic2 = "My Second Topic".to_string();
-    let topic3 = "My Third Topic".to_string();
     
     let message1 = "My first message!".to_string();
     let message2 = "My second message!".to_string();
@@ -21,9 +20,6 @@ fn main() {
     pub_api::send(pid, topic2.clone(), message3.clone());
 
     let sid = sub_api::register_subscriber().unwrap();
-
-    // Wait for publisher to publish topics and messages //
-    std::thread::sleep(std::time::Duration::from_secs(3));
 
     // Subscribe to first topic //
     sub_api::subscribe(sid, topic1.clone());
@@ -55,4 +51,6 @@ fn main() {
     for msg in my_msgs {
         println!("Message received: {}", msg);
     }
+
+    pub_api::send(pid, topic1.clone(), message4.clone());
 }
