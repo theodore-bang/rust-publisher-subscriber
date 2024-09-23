@@ -3,6 +3,11 @@ use sub_api;
 
 fn main() {
     let pid = pub_api::register_publisher().unwrap();
+    println!("Registered PID: {}", pid);
+    let pid = pub_api::register_publisher().unwrap();
+    println!("Registered PID: {}", pid);
+    let pid = pub_api::register_publisher().unwrap();
+    println!("Registered PID: {}", pid);
 
     let topic1 = "My First Topic".to_string();
     let topic2 = "My Second Topic".to_string();
@@ -20,6 +25,11 @@ fn main() {
     pub_api::send(pid, &topic2, &message3);
 
     let sid = sub_api::register_subscriber().unwrap();
+    println!("Registered SID: {}", sid);
+    let sid = sub_api::register_subscriber().unwrap();
+    println!("Registered SID: {}", sid);
+    let sid = sub_api::register_subscriber().unwrap();
+    println!("Registered SID: {}", sid);
 
     // Subscribe to first topic //
     sub_api::subscribe(sid, &topic1);

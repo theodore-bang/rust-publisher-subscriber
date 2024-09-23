@@ -17,11 +17,10 @@
 
 use std::collections::HashMap;
 use common::{Sid, Pid};
+use rand::{rngs::ThreadRng, Rng};
 
 // Broker Data Structure //
 pub struct Broker {
-    sid_generator: Sid,
-    pid_generator: Pid,
     sub_list: Vec<Sid>,
     pub_list: Vec<Sid>,
     topics: HashMap<String, Topic>,
@@ -31,8 +30,6 @@ pub struct Broker {
 impl Broker {
     pub fn new() -> Self {
         Self {
-            sid_generator: 0,
-            pid_generator: 0,
             sub_list: Vec::new(),
             pub_list: Vec::new(),
             topics: HashMap::new(),
@@ -49,16 +46,16 @@ impl Broker {
     }
 
     pub fn register_sub(&mut self) -> Sid {
-        self.sid_generator += 1;
-        self.sub_list.push(self.sid_generator);
-        println!("Server: registering SID {}", self.sid_generator);
-        self.sid_generator.clone()
+        let new_sid: u64 = rand::thread_rng().gen();
+        self.sub_list.push(new_sid);
+        println!("Server: registering SID {}", new_sid);
+        new_sid
     }
     pub fn register_pub(&mut self) -> Pid {
-        self.pid_generator += 1;
-        self.pub_list.push(self.pid_generator);
-        println!("Server: registering PID {}", self.pid_generator);
-        self.pid_generator.clone()
+        let new_pid: u64 = rand::thread_rng().gen();
+        self.pub_list.push(new_pid);
+        println!("Server: registering SID {}", new_pid);
+        new_pid
     }
 
     pub fn create_topic(&mut self, pid: Pid, topic_name: String) {

@@ -21,6 +21,7 @@ use common::{Sid, Pid};
 use std::io::{self, BufReader, BufWriter, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, RwLock};
+use rand::Rng;
 use std::thread;
 use serde_json;
 
