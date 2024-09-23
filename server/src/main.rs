@@ -1,3 +1,21 @@
+// SERVER //
+/*
+// The server listens for TCP connections at address "common::ADDR", 
+// defined in the "common" library crate. If you want to change this address,
+// change it in the library crate `common` and then rebuild the Rust Workspace.
+// When a new connection is made, the server spawns a new thread to handle
+// the connection, which is done with function `handle_client()`.
+// 
+// Server data, i.e. the message bus or message broker, is held in the object
+// `server_data`, which is an instance of `Broker` that holds the Topics and
+// Messages of the server. There is only one instance of this `server_data`.
+// Access to this `server_data` is shared between threads via an Arc Pointer,
+// and guarded by a Read-Write Mutex (`RwLock`).
+// 
+// A spawned thread reads the client's request and then calls the appropriate
+// method for `server_data`.
+*/
+
 use common::{ADDR, Procedures, Stub};
 use common::{Sid, Pid};
 use std::io::{self, BufReader, BufWriter, Read, Write};
@@ -11,25 +29,22 @@ use crate::broker::Broker;
 
 // Server Entry Point //
 /*
-// The server listens in on 
+// Server begins by creating a Message Broker, and then listening at a hardcoded
+// address ("common::ADDR").
 */
 fn main() -> io::Result<()> {
+    // Wrap server_data object in RwLock Mutex and Arc Pointer //
+    let server_data = Arc::new(RwLock::new(Broker::new()));
+
     // Bind the server to a local address and port //
     let listener = TcpListener::bind(ADDR)?;
     println!("Server: listening at {}", ADDR);
 
-    // Wrap Broker object in RwMutex and Arc Pointer //
-    /* 
-    // Arc Pointer allows the Broker to be accessed across multiple threads safely,
-    // while the RwMutex ensures that only one thread can mutate the Broker at a
-    // given time (solving data-races) but multiple threads can atomically read data.
-    */
-    let server_data = Arc::new(RwLock::new(Broker::new()));
-
     // Accept connections in a loop //
     for stream in listener.incoming() {
-        // 
+        // Clone a reference to server_data to give to new thread //
         let ref_to_server = Arc::clone(&server_data);
+
         // Spawn Thread for client if connection is successful //
         match stream {
             Ok(stream) => {
@@ -51,6 +66,13 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
+// Handle individual Client connections //
+/*
+// This function will be run by spawned threads for every client request.
+// Todo: I haven't decided how to handle server errors yet. The problem is that
+// if the client expects a response, the server might not be able to provide one.
+// The client should probably implement some timeout error.
+*/
 fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io::Result<()> {
     // Buffer to hold bytes from request //
     // Todo: change this to a BufReader...
@@ -66,7 +88,7 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
 
     // Handle client's request //
     /*
-    // Depending on procedure listed in the stub, call the appropriate 
+    // Depending on procedure listed in the server stub, call the appropriate 
     // Broker method.
      */
     match received.procedure {
@@ -94,6 +116,7 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
             let pid = received.id;
             let topic_name = received.args[0].clone();
             server_data.write().unwrap().delete_topic(pid, topic_name);
+            // No response neede by client //
         },
         Procedures::Send => {
             let pid = received.id;
@@ -106,12 +129,16 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
             let sid = received.id;
             let topic_name = received.args[0].clone();
             server_data.write().unwrap().subscribe(sid, topic_name);
+            // No response neede by client //
         },
         Procedures::Pull => {
             let sid = received.id;
             let topic_name = received.args[0].clone();
             let all_msgs = server_data.write().unwrap().pull(sid, topic_name);
             let response = serde_json::to_string(&all_msgs).unwrap();
+
+            // Send messages back to Client //
+            /* Todo: as mentioned, need to do better error handling. */
             stream.write_all(response.as_bytes())?;
         }
     }

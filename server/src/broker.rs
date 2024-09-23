@@ -1,7 +1,24 @@
-use std::collections::HashMap;
+// MESSAGE BROKER or MESSAGE BUS //
+/*
+// The `Broker` stucture holds all the topics and messages of the server,
+// plus information about registered subscribers and publishers.
+// There is one instance of a Broker on the server, and individual threads
+// that are handling client requests access the Broker through an Arc Pointer
+// and RwLock Mutex.
+//
+// The `Topic` stucture holds information about a specific topic.
+// Topics are unique by their name. Topics hold a list of `Message` objects.
+//
+// A `Message` stucture holds a list of String `content` and a list of
+// subscribers (`not_seen`) who have not yet seen the message.
+// Messages get deleted after a client requests a pull, by checking if
+// the `not_seen` list is empty.
+*/
 
+use std::collections::HashMap;
 use common::{Sid, Pid};
 
+// Broker Data Structure //
 pub struct Broker {
     sid_generator: Sid,
     pid_generator: Pid,
@@ -10,6 +27,7 @@ pub struct Broker {
     topics: HashMap<String, Topic>,
 }
 
+// Broker Methods //
 impl Broker {
     pub fn new() -> Self {
         Self {
@@ -21,9 +39,11 @@ impl Broker {
         }
     }
 
+    // Check that SID is actually a subscriber //
     pub fn check_sid(&self, sid: Sid) -> bool {
         self.sub_list.contains(&sid)
     }
+    // Check that PID is actually a subscriber //
     pub fn check_pid(&self, pid: Pid) -> bool {
         self.sub_list.contains(&pid)
     }
@@ -86,6 +106,11 @@ impl Broker {
 
 }
 
+// Topic Structure //
+/*
+ - publisher: Pid of topic creator
+ - subs_list: list of current subscribers
+*/
 pub struct Topic {
     pub topic_name: String,
     pub publisher: Pid,
@@ -93,13 +118,6 @@ pub struct Topic {
     pub messages: Vec<Message>,
 
 }
-
-#[derive(Debug, Clone)]
-pub struct Message {
-    pub content: String,
-    pub not_seen: Vec<Sid>,
-}
-
 impl Topic {
     pub fn subscribe(&mut self, sid: Sid) {
         self.subs_list.push(sid);
@@ -128,4 +146,11 @@ impl Topic {
         
         output
     }
+}
+
+// Message Structure //
+#[derive(Debug, Clone)]
+pub struct Message {
+    pub content: String,
+    pub not_seen: Vec<Sid>,
 }
