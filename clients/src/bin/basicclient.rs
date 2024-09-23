@@ -12,45 +12,45 @@ fn main() {
     let message3 = "My third message!".to_string();
     let message4 = "My fourth message!".to_string();
 
-    pub_api::create_topic(pid, topic1.clone());
+    pub_api::create_topic(pid, &topic1);
 
-    pub_api::create_topic(pid, topic2.clone());
-    pub_api::send(pid, topic2.clone(), message1.clone());
-    pub_api::send(pid, topic2.clone(), message2.clone());
-    pub_api::send(pid, topic2.clone(), message3.clone());
+    pub_api::create_topic(pid, &topic2);
+    pub_api::send(pid, &topic2, &message1);
+    pub_api::send(pid, &topic2, &message2);
+    pub_api::send(pid, &topic2, &message3);
 
     let sid = sub_api::register_subscriber().unwrap();
 
     // Subscribe to first topic //
-    sub_api::subscribe(sid, topic1.clone());
-    sub_api::subscribe(sid, topic2.clone());
+    sub_api::subscribe(sid, &topic1);
+    sub_api::subscribe(sid, &topic2);
 
-    pub_api::send(pid, topic1.clone(), message1.clone());
-    pub_api::send(pid, topic2.clone(), message1.clone());
-    pub_api::send(pid, topic2.clone(), message2.clone());
+    pub_api::send(pid, &topic1, &message1);
+    pub_api::send(pid, &topic2, &message1);
+    pub_api::send(pid, &topic2, &message2);
 
     // Print messages from first topic //
-    let my_msgs = sub_api::pull(sid, topic1.clone());
+    let my_msgs = sub_api::pull(sid, &topic1);
     println!("From topic 1:");
     for msg in my_msgs {
         println!("Message received: {}", msg);
     }
 
     // Try getting messages from second topic //
-    let my_msgs = sub_api::pull(sid, topic2.clone());
+    let my_msgs = sub_api::pull(sid, &topic2);
     println!("From topic 2:");
     for msg in my_msgs {
         println!("Message received: {}", msg);
     }
 
-    pub_api::send(pid, topic1.clone(), message3.clone());
+    pub_api::send(pid, &topic1, &message3);
 
     // Print messages from first topic //
-    let my_msgs = sub_api::pull(sid, topic1.clone());
+    let my_msgs = sub_api::pull(sid, &topic1);
     println!("From topic 1:");
     for msg in my_msgs {
         println!("Message received: {}", msg);
     }
 
-    pub_api::send(pid, topic1.clone(), message4.clone());
+    pub_api::send(pid, &topic1, &message4);
 }

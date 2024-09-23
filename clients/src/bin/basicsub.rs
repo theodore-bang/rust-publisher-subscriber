@@ -10,18 +10,18 @@ fn main() {
     std::thread::sleep(std::time::Duration::from_secs(3));
 
     // Subscribe to first topic //
-    sub_api::subscribe(sid, topic1.clone());
-    sub_api::subscribe(sid, topic2.clone());
+    sub_api::subscribe(sid, &topic1);
+    sub_api::subscribe(sid, &topic2);
 
     // Print messages from first topic //
-    let my_msgs = sub_api::pull(sid, topic1.clone());
+    let my_msgs = sub_api::pull(sid, &topic1);
     println!("From topic 1:");
     for msg in my_msgs {
         println!("Message received: {}", msg);
     }
 
     // Try getting messages from second topic //
-    let my_msgs = sub_api::pull(sid, topic2.clone());
+    let my_msgs = sub_api::pull(sid, &topic2);
     println!("From topic 2:");
     for msg in my_msgs {
         println!("Message received: {}", msg);

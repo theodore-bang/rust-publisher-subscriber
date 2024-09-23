@@ -26,13 +26,13 @@ pub fn register_subscriber() -> Result<Sid, String> {
     Ok(new_sid)
 }
 
-pub fn subscribe(sid: Sid, topic: String) {
+pub fn subscribe(sid: Sid, topic: &str) {
     let mut stream = try_connect().unwrap();
 
     let rpc = Stub {
         id: sid,
         procedure: Procedures::Subscribe,
-        args: vec![topic.clone()]
+        args: vec![topic.to_string()]
     };
 
     // Prepare the message to send //
@@ -44,13 +44,13 @@ pub fn subscribe(sid: Sid, topic: String) {
     // We don't expect a response //
 }
 
-pub fn pull(sid: Sid, topic: String) -> Messages {
+pub fn pull(sid: Sid, topic: &str) -> Messages {
     let mut stream = try_connect().unwrap();
 
     let rpc = Stub {
         id: sid,
         procedure: Procedures::Pull,
-        args: vec![topic],
+        args: vec![topic.to_string()],
     };
 
     // Prepare the message to send //

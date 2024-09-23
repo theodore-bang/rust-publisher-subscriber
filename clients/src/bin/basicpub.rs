@@ -12,11 +12,11 @@ fn main() {
     let message3 = "My third message!".to_string();
     let message4 = "My fourth message!".to_string();
 
-    pub_api::create_topic(pid, topic1.clone());
-    pub_api::send(pid, topic1.clone(), message1.clone());
+    pub_api::create_topic(pid, &topic1);
+    pub_api::send(pid, &topic1, &message1);
 
-    pub_api::create_topic(pid, topic2.clone());
-    pub_api::send(pid, topic2.clone(), message1.clone());
-    pub_api::send(pid, topic2.clone(), message2.clone());
-    pub_api::send(pid, topic2.clone(), message3.clone());
+    pub_api::create_topic(pid, &topic2);
+    pub_api::send(pid, &topic2, &message1);
+    pub_api::send(pid, &topic2, &message2);
+    pub_api::send(pid, &topic2, &message3);
 }

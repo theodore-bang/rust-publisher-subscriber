@@ -24,13 +24,13 @@ pub fn register_publisher() -> Option<Pid> {
     Some(response)
 }
 
-pub fn create_topic(pid: Pid, topic: String) {
+pub fn create_topic(pid: Pid, topic: &str) {
     let mut stream = try_connect().unwrap();
 
     let rpc = common::Stub {
         id: pid,
         procedure: common::Procedures::CreateTopic,
-        args: vec![topic.clone()],
+        args: vec![topic.to_string()],
     };
 
     // Prepare the message to send //
@@ -42,13 +42,13 @@ pub fn create_topic(pid: Pid, topic: String) {
     // We don't expect a response //
 }
 
-pub fn delete_topic(pid: Pid, topic: String) {
+pub fn delete_topic(pid: Pid, topic: &str) {
     let mut stream = try_connect().unwrap();
 
     let rpc = common::Stub {
         id: pid,
         procedure: common::Procedures::DeleteTopic,
-        args: vec![topic.clone()],
+        args: vec![topic.to_string()],
     };
 
     // Prepare the message to send //
@@ -60,13 +60,13 @@ pub fn delete_topic(pid: Pid, topic: String) {
     // We don't exepct a response //
 }
 
-pub fn send(pid: Pid, topic: String, message: String) {
+pub fn send(pid: Pid, topic: &str, message: &str) {
     let mut stream = try_connect().unwrap();
 
     let rpc = common::Stub {
         id: pid,
         procedure: common::Procedures::Send,
-        args: vec![topic.clone(), message.clone()],
+        args: vec![topic.to_string(), message.to_string()],
     };
 
     // Prepare the message to send //
@@ -76,19 +76,4 @@ pub fn send(pid: Pid, topic: String, message: String) {
     let _ = stream.write_all(message.as_bytes());
 
     // We don't expect a response //
-}
-
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 }
