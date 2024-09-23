@@ -7,9 +7,9 @@ pub fn register_publisher() -> Option<Pid> {
     let mut stream = try_connect().unwrap();
 
     let rpc = common::Stub {
-        id: None,
+        id: 0,
         procedure: common::Procedures::RegisterPublisher,
-        args: None,
+        args: vec![],
     };
 
     // Prepare the message to send //
@@ -28,9 +28,9 @@ pub fn create_topic(pid: Pid, topic: String) {
     let mut stream = try_connect().unwrap();
 
     let rpc = common::Stub {
-        id: Some(pid),
+        id: pid,
         procedure: common::Procedures::CreateTopic,
-        args: Some(vec![topic.clone()]),
+        args: vec![topic.clone()],
     };
 
     // Prepare the message to send //
@@ -40,20 +40,42 @@ pub fn create_topic(pid: Pid, topic: String) {
     let _ = stream.write_all(message.as_bytes());
 
     // We don't expect a response //
-    /*
-    let reader = BufReader::new(&stream);
-    let response: Pid = serde_json::from_reader(reader).unwrap();
-
-    Some(response)
-    */
 }
 
 pub fn delete_topic(pid: Pid, topic: String) {
-    todo!()
+    let mut stream = try_connect().unwrap();
+
+    let rpc = common::Stub {
+        id: pid,
+        procedure: common::Procedures::DeleteTopic,
+        args: vec![topic.clone()],
+    };
+
+    // Prepare the message to send //
+    let message = serde_json::to_string(&rpc).unwrap();
+    
+    // Send the message //
+    let _ = stream.write_all(message.as_bytes());
+
+    // We don't exepct a response //
 }
 
 pub fn send(pid: Pid, topic: String, message: String) {
-    todo!()
+    let mut stream = try_connect().unwrap();
+
+    let rpc = common::Stub {
+        id: pid,
+        procedure: common::Procedures::Send,
+        args: vec![topic.clone(), message.clone()],
+    };
+
+    // Prepare the message to send //
+    let message = serde_json::to_string(&rpc).unwrap();
+    
+    // Send the message //
+    let _ = stream.write_all(message.as_bytes());
+
+    // We don't expect a response //
 }
 
 pub fn add(left: u64, right: u64) -> u64 {

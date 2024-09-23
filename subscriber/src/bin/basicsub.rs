@@ -1,5 +1,30 @@
 use sub_api;
 
 fn main() {
-    todo!()
+    let topic1 = "My First Topic".to_string();
+    let topic2 = "My Second Topic".to_string();
+
+    let sid = sub_api::register_subscriber().unwrap();
+
+    // Wait for publisher to publish topics and messages //
+    std::thread::sleep(std::time::Duration::from_secs(3));
+
+    // Subscribe to first topic //
+    sub_api::subscribe(sid, topic1.clone());
+    sub_api::subscribe(sid, topic2.clone());
+
+    // Print messages from first topic //
+    let my_msgs = sub_api::pull(sid, topic1.clone());
+    println!("From topic 1:");
+    for msg in my_msgs {
+        println!("Message received: {}", msg);
+    }
+
+    // Try getting messages from second topic //
+    let my_msgs = sub_api::pull(sid, topic2.clone());
+    println!("From topic 2:");
+    for msg in my_msgs {
+        println!("Message received: {}", msg);
+    }
+
 }

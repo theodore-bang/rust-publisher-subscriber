@@ -9,9 +9,9 @@ pub type Messages = Vec<String>;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Stub {
-    pub id: Option<u64>,
+    pub id: u64,
     pub procedure: Procedures,
-    pub args: Option<Vec<String>>,
+    pub args: Vec<String>,
 }
 
 /*

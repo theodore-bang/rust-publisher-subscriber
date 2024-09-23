@@ -59,16 +59,27 @@ impl Broker {
         if found.publisher == pid {
             self.topics.remove(&topic_name);
         }
+        println!("Deleted topic: {}", topic_name);
     }
 
     pub fn add_message(&mut self, topic_name: String, content: String) {
-        todo!()
+        let Some(found) = self.topics.get_mut(&topic_name) else {return ()};
+        found.new_message(content);
+        println!("Added message to topic: {}", topic_name);
+    }
+
+    pub fn subscribe(&mut self, sid: Sid, topic_name: String) {
+        let Some(found) = self.topics.get_mut(&topic_name) else {return ()};
+        found.subscribe(sid);
     }
 
     pub fn pull(&mut self, sid: Sid, topic_name: String) -> Vec<String> {
+        // println!("Pulling \"{}\" messages for {}", topic_name, sid);
         if let Some(topic) = self.topics.get_mut(&topic_name) {
-            topic.get_messages(sid)
+            println!("Found topic");
+            return topic.get_messages(sid);
         } else {
+            println!("Failed to find topic");
             vec![]
         }
     }
@@ -83,17 +94,21 @@ pub struct Topic {
 
 }
 
-#[derive(Debug, )]
+#[derive(Debug, Clone)]
 pub struct Message {
     pub content: String,
     pub not_seen: Vec<Sid>,
 }
 
 impl Topic {
-    pub fn new_message(&mut self, content: String, sids: Vec<Sid>) {
+    pub fn subscribe(&mut self, sid: Sid) {
+        self.subs_list.push(sid);
+    }
+    
+    pub fn new_message(&mut self, content: String) {
         let new_message = Message {
             content: content.clone(),
-            not_seen: sids,
+            not_seen: self.subs_list.clone(),
         };
 
         self.messages.push(new_message);
@@ -101,14 +116,21 @@ impl Topic {
 
     pub fn get_messages(&mut self, sid: Sid) -> Vec<String> {
         let mut output = Vec::new();
+        for msg in self.messages.iter() {
+            output.push(msg.content.clone());
+        }
+        output
+        /*  let mut output = Vec::new();
 
+        
         for message in self.messages.iter_mut() {
             if message.not_seen.contains(&sid) {
                 output.push(message.content.clone());
             }
             message.not_seen.retain(|&a_sid| a_sid != sid );
         }
-
+        
         output
+        */
     }
 }
