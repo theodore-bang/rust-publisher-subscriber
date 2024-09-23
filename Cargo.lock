@@ -193,6 +193,7 @@ version = "0.1.0"
 dependencies = [
  "common",
  "pub-api",
+ "sub-api",
 ]
 
 [[package]]

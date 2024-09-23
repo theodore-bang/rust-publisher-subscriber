@@ -116,21 +116,16 @@ impl Topic {
 
     pub fn get_messages(&mut self, sid: Sid) -> Vec<String> {
         let mut output = Vec::new();
-        for msg in self.messages.iter() {
-            output.push(msg.content.clone());
-        }
-        output
-        /*  let mut output = Vec::new();
 
         
         for message in self.messages.iter_mut() {
             if message.not_seen.contains(&sid) {
+                // println!("Message found");
                 output.push(message.content.clone());
             }
             message.not_seen.retain(|&a_sid| a_sid != sid );
         }
         
         output
-        */
     }
 }
