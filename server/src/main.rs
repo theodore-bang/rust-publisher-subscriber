@@ -14,6 +14,9 @@
 // 
 // A spawned thread reads the client's request and then calls the appropriate
 // method for `server_data`.
+//
+// PS: you can ignore anything marked as //metric// as these are just part of
+// recording requests per second for prometheus, an analyzer app
 */
 
 use common::{ADDR, Procedures, Stub};
@@ -198,8 +201,7 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) {
     // Ok(())
 }
 
-
-
+// Send metric about Requests per Second to Prometheus app //
 fn handle_metrics(mut stream: TcpStream, registry: &Registry) {
     let mut buffer = Vec::new();
 
