@@ -16,7 +16,7 @@ list_descendants ()
 
 while true; do
     sleep 2
-    ./target/debug/send &
+    ./target/debug/pull &
 done &
 
 sleep 90

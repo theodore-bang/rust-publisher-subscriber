@@ -1,11 +1,11 @@
-use pub_api;
+use pub_api::*;
 
 fn main() {
     let pid = pub_api::register_publisher().unwrap();
 
-    let topic = "A Topic Name of 20B!".to_string();
+    let topic = "A Topic Name of 20B!";
 
     loop {
-        pub_api::create_topic(pid, &topic);
+        create_topic(pid, &topic);
     }
 }

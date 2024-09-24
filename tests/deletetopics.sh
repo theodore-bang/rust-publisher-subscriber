@@ -16,7 +16,7 @@ list_descendants ()
 
 while true; do
     sleep 2
-    ./target/debug/send &
+    ./target/debug/deletetopic &
 done &
 
 sleep 90
@@ -24,3 +24,4 @@ sleep 90
 kill $(list_descendants $$)
 
 echo "All background processes have been terminated."
+

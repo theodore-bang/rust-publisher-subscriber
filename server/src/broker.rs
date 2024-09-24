@@ -64,15 +64,17 @@ impl Broker {
             println!("Server: {} is not a publisher! {:?}", pid, self.pub_list);
             return ();
         }
-        let new_topic = Topic {
-            topic_name: topic_name.clone(),
-            publisher: pid,
-            subs_list: Vec::new(),
-            messages: Vec::new(),
-        };
+        if !self.topics.contains_key(&topic_name) {
+            let new_topic = Topic {
+                topic_name: topic_name.clone(),
+                publisher: pid,
+                subs_list: Vec::new(),
+                messages: Vec::new(),
+            };
 
-        self.topics.insert(topic_name.clone(), new_topic);
-        println!("Server: created topic \"{}\"", topic_name);
+            self.topics.insert(topic_name.clone(), new_topic);
+            println!("Server: created topic \"{}\"", topic_name);
+        }
     }
 
     pub fn delete_topic(&mut self, pid: Pid, topic_name: String) {
@@ -139,7 +141,9 @@ pub struct Topic {
 }
 impl Topic {
     pub fn subscribe(&mut self, sid: Sid) {
-        self.subs_list.push(sid);
+        if !self.subs_list.contains(&sid) {
+            self.subs_list.push(sid);
+        }
     }
     
     pub fn new_message(&mut self, content: String) {

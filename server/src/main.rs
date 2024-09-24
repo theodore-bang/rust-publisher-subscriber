@@ -198,10 +198,19 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) {
     // Ok(())
 }
 
+
+
 fn handle_metrics(mut stream: TcpStream, registry: &Registry) {
-    let encoder = TextEncoder::new();
-    let metric_families = registry.gather();
     let mut buffer = Vec::new();
+
+    writeln!(&mut buffer, "HTTP/1.1 200 OK").unwrap();
+    writeln!(&mut buffer, "Content-Type: text/plain; version=0.0.4\n").unwrap();
+
+    // Write the Prometheus metrics
+    let metric_families = registry.gather();
+    let encoder = TextEncoder::new();
     encoder.encode(&metric_families, &mut buffer).unwrap();
+
+    // Write the response to the stream
     stream.write_all(&buffer).unwrap();
 }

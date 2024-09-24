@@ -8,7 +8,6 @@ fn sleep(secs: u64) {
 fn main() {
     let first_topic = "FIRST TOPIC";
     let second_topic = "SECOND TOPIC";
-    let changed_owner = "TOPIC CHANGED OWNER";
     let deleted_topic = "DELETED TOPIC";
     
     // Test we can registers subs and pubs //
@@ -25,11 +24,6 @@ fn main() {
 
     delete_topic(pub1, &deleted_topic);
     create_topic(pub2, &second_topic);
-
-    // Topic will change owner if Publisher tries to create topic
-    // with existing name
-    create_topic(pub2, &changed_owner);
-    create_topic(pub1, &changed_owner);
 
     // Test that subs can subscribe to topics
     subscribe(sub1, &first_topic);

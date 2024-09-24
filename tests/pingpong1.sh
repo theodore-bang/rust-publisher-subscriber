@@ -1,8 +1,26 @@
 #!/usr/bin/env sh
 
-timeout 20s ./target/debug/server > ./tests/pingpong1server.txt &
+list_descendants ()
+{
+  local children=$(ps -o pid= --ppid "$1")
+
+  for pid in $children
+  do
+    list_descendants "$pid"
+  done
+
+  echo "$children"
+}
+
+./target/debug/server > /dev/null &
 
 sleep 1
 
-timeout 15s ./target/debug/ping & 
-timeout 15s ./target/debug/pong &
+./target/debug/ping & 
+./target/debug/pong &
+
+sleep 5
+
+kill $(list_descendants $$)
+
+echo "All background processes have been terminated."

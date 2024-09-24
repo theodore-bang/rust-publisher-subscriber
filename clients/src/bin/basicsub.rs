@@ -1,29 +1,37 @@
-use sub_api;
+use sub_api::*;
 
+fn sleep(secs: u64) {
+    std::thread::sleep(std::time::Duration::from_secs(secs));
+}
 fn main() {
-    let topic1 = "My First Topic";
-    let topic2 = "My Second Topic";
+    let first_topic = "FIRST TOPIC";
+    let second_topic = "SECOND TOPIC";
 
-    // Register //
-    let sid = sub_api::register_subscriber().unwrap();
+    let sub1 = register_subscriber().unwrap();
 
-    // Wait for publisher to publish topics and messages //
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    sleep(1);
 
-    // Subscribe to first topic //
-    sub_api::subscribe(sid, &topic1);
-    sub_api::subscribe(sid, &topic2);
+    subscribe(sub1, &first_topic);
+    subscribe(sub1, &second_topic);
 
-    // Print messages from first topic //
-    let my_msgs = sub_api::pull(sid, &topic1);
-    for msg in my_msgs {
-        println!("Subscriber: message received: {}", msg);
+    sleep(1);
+    
+    let sub1_msgs1 = pull(sub1, &first_topic);
+    let sub1_msgs2 = pull(sub1, &second_topic);
+
+    for msg in sub1_msgs1 {
+        println!("{sub1} received: {msg} from {first_topic}");
+    }
+    for msg in sub1_msgs2 {
+        println!("{sub1} received: {msg} from {second_topic}");
     }
 
-    // Try getting messages from second topic //
-    let my_msgs = sub_api::pull(sid, &topic2);
-    for msg in my_msgs {
-        println!("Subscriber: message received: {}", msg);
-    }
+    println!("{sub1} waiting...");
+    sleep(1);
 
+    let sub1_msgs1 = pull(sub1, &first_topic);
+
+    for msg in sub1_msgs1 {
+        println!("{sub1} received: {msg} from {first_topic}");
+    }
 }

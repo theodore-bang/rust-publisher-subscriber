@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
 
-./target/debug/server &
+timeout 7s ./target/debug/server > /dev/null &
 
 sleep 1
 
 ./target/debug/basicpub &
 ./target/debug/basicsub & 
 
-sleep 5
+sleep 10
 pkill -P $$

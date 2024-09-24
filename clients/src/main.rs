@@ -1,3 +1,3 @@
 fn main() {
-    println!("Hello, world!");
+    println!("Tests clients are in clients/src/bin/");
 }
