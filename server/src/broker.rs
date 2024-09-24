@@ -17,12 +17,12 @@
 
 use std::collections::HashMap;
 use common::{Sid, Pid};
-use rand::{rngs::ThreadRng, Rng};
+use rand::Rng;
 
 // Broker Data Structure //
 pub struct Broker {
     sub_list: Vec<Sid>,
-    pub_list: Vec<Sid>,
+    pub_list: Vec<Pid>,
     topics: HashMap<String, Topic>,
 }
 
@@ -42,7 +42,7 @@ impl Broker {
     }
     // Check that PID is actually a subscriber //
     pub fn check_pid(&self, pid: Pid) -> bool {
-        self.sub_list.contains(&pid)
+        self.pub_list.contains(&pid)
     }
 
     pub fn register_sub(&mut self) -> Sid {
@@ -59,6 +59,11 @@ impl Broker {
     }
 
     pub fn create_topic(&mut self, pid: Pid, topic_name: String) {
+        // If pid is not of registered Publisher, do nothing //
+        if !self.check_pid(pid) {
+            println!("Server: {} is not a publisher! {:?}", pid, self.pub_list);
+            return ();
+        }
         let new_topic = Topic {
             topic_name: topic_name.clone(),
             publisher: pid,
@@ -71,26 +76,43 @@ impl Broker {
     }
 
     pub fn delete_topic(&mut self, pid: Pid, topic_name: String) {
-        let Some(found) = self.topics.get(&topic_name) else { return () };
+        // If topic is not found, do nothing //
+        let Some(found) = self.topics.get(&topic_name) else {
+            println!("Server: topic not found");
+            return () 
+        };
 
+        // If pid is not that of Topic's creator, do nothing //
         if found.publisher == pid {
             self.topics.remove(&topic_name);
             println!("Server: deleted topic \"{}\"", topic_name);
         }
     }
 
-    pub fn add_message(&mut self, topic_name: String, content: String) {
+    pub fn add_message(&mut self, pid: Pid, topic_name: String, content: String) {
+        // If pid is not of registered Publisher, do nothing //
+        if !self.check_pid(pid) {
+            return ();
+        }
         let Some(topic) = self.topics.get_mut(&topic_name) else {return ()};
         topic.new_message(content);
         println!("Server: added message to topic: {}", topic_name);
     }
 
     pub fn subscribe(&mut self, sid: Sid, topic_name: String) {
+        // If sid is not of registered Subscriber, do nothing //
+        if !self.check_sid(sid) {
+            return ();
+        }
         let Some(found) = self.topics.get_mut(&topic_name) else {return ()};
         found.subscribe(sid);
     }
 
     pub fn pull(&mut self, sid: Sid, topic_name: String) -> Vec<String> {
+        // If sid is not of registered Subscriber, return empty list //
+        if !self.check_sid(sid) {
+            return vec![];
+        }
         // println!("Pulling \"{}\" messages for {}", topic_name, sid);
         if let Some(topic) = self.topics.get_mut(&topic_name) {
             println!("Server: pulling {} messages for {sid}", &topic.topic_name);

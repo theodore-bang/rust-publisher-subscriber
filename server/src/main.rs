@@ -18,10 +18,10 @@
 
 use common::{ADDR, Procedures, Stub};
 use common::{Sid, Pid};
-use std::io::{self, BufReader, BufWriter, Read, Write};
+use std::io::{self, Read, Write};
+// use std::io::{BufReader, BufWriter};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, RwLock};
-use rand::Rng;
 use std::thread;
 use serde_json;
 
@@ -78,7 +78,7 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
     // Buffer to hold bytes from request //
     // Todo: change this to a BufReader...
     // ...though I had problems with that before.
-    let mut buffer = [0; 512];
+    let mut buffer: [u8; 512] = [0; 512];
     
     // Read data from the client as bytes //
     let bytes_read = stream.read(&mut buffer)?;
@@ -94,46 +94,46 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
      */
     match received.procedure {
         Procedures::RegisterSubscriber => {
-            let new_sid = server_data.write().unwrap().register_sub();
+            let new_sid: Sid = server_data.write().unwrap().register_sub();
 
             // Send SID back to the client //
             let response = serde_json::to_string(&new_sid).unwrap();
             let _ = stream.write_all(response.as_bytes());
         },
         Procedures::RegisterPublisher => {
-            let new_pid = server_data.write().unwrap().register_pub();
+            let new_pid: Pid = server_data.write().unwrap().register_pub();
 
             // Send PID back to the client //
             let response = serde_json::to_string(&new_pid).unwrap();
             let _ = stream.write_all(response.as_bytes());
         },
         Procedures::CreateTopic => {
-            let pid = received.id;
+            let pid: Pid = received.id;
             let topic_name = received.args[0].clone();
             server_data.write().unwrap().create_topic(pid, topic_name);
             // No response neede by client //
         },
         Procedures::DeleteTopic => {
-            let pid = received.id;
+            let pid: Pid = received.id;
             let topic_name = received.args[0].clone();
             server_data.write().unwrap().delete_topic(pid, topic_name);
             // No response neede by client //
         },
         Procedures::Send => {
-            let pid = received.id;
+            let pid: Pid = received.id;
             let topic_name = received.args[0].clone();
             let message_content = received.args[1].clone();
-            server_data.write().unwrap().add_message(topic_name, message_content);
+            server_data.write().unwrap().add_message(pid, topic_name, message_content);
             // No response neede by client //
         },
         Procedures::Subscribe => {
-            let sid = received.id;
+            let sid: Sid = received.id;
             let topic_name = received.args[0].clone();
             server_data.write().unwrap().subscribe(sid, topic_name);
             // No response neede by client //
         },
         Procedures::Pull => {
-            let sid = received.id;
+            let sid: Sid = received.id;
             let topic_name = received.args[0].clone();
             let all_msgs = server_data.write().unwrap().pull(sid, topic_name);
             let response = serde_json::to_string(&all_msgs).unwrap();

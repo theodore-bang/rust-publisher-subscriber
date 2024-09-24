@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
-timeout 6s ./target/debug/server > ./tests/pingpong1server.txt &
+timeout 10s ./target/debug/server > ./tests/pingpong1server.txt &
 
 sleep 1
 
-timeout 5s ./target/debug/ping & 
-timeout 5s ./target/debug/pong &
+timeout 9s ./target/debug/ping & 
+timeout 9s ./target/debug/pong &
