@@ -25,15 +25,61 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use serde_json;
 
+use std::time::{Duration, Instant};
+use prometheus::{Encoder, TextEncoder, IntCounter, IntGauge, Registry};
+use lazy_static::lazy_static;
+
 mod broker;
 use crate::broker::Broker;
 
+
+// Metric: Counters for Prometheus //
+lazy_static! {
+    static ref REQUEST_COUNTER: IntCounter = IntCounter::new("tcp_requests_total", "Total TCP requests").unwrap();
+    static ref REQUESTS_PER_SECOND: IntGauge = IntGauge::new("tcp_requests_per_second", "Requests per second").unwrap();
+}
+
 // Server Entry Point //
 /*
-// Server begins by creating a Message Broker, and then listening at a hardcoded
+// Server starts by setting up the metric collection system. These metrics will be sent
+// to metric analyzer Prometheus, at address 127.0.0.1:9898 - if any part of this system 
+// fails, the server should continue functioning, but metrics won't be collected.
+// Server then begins by creating a Message Broker, and then listening at a hardcoded
 // address ("common::ADDR").
 */
 fn main() -> io::Result<()> {
+    // Metrics: Create counters for Prometheus //
+    let registry = Registry::new();
+    registry.register(Box::new(REQUEST_COUNTER.clone())).unwrap();
+    registry.register(Box::new(REQUESTS_PER_SECOND.clone())).unwrap();
+
+    // Metrics: thread that counts "requests per second" //
+    thread::spawn(move || {
+        loop {
+            let _start = Instant::now();
+            let start_count = REQUEST_COUNTER.get();
+
+            thread::sleep(Duration::from_secs(1));
+
+            // Calculate requests per second (rps)
+            let end_count = REQUEST_COUNTER.get();
+            let rps = end_count - start_count;
+            REQUESTS_PER_SECOND.set(rps as i64);
+        }
+    });
+
+    // Metrics: 
+    thread::spawn(move || {
+        let addr = "127.0.0.1:9898";
+        let listener = TcpListener::bind(addr).unwrap();
+        // println!("Metrics server running at {}", addr);
+
+        for stream in listener.incoming() {
+            let stream = stream.unwrap();
+            handle_metrics(stream, &registry);
+        }
+    });
+
     // Wrap server_data object in RwLock Mutex and Arc Pointer //
     let server_data = Arc::new(RwLock::new(Broker::new()));
 
@@ -145,6 +191,17 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) {
             let _ = stream.write_all(response.as_bytes());
         }
     }
+
+    // Metric: Count a request as finished //
+    REQUEST_COUNTER.inc();
     
     // Ok(())
+}
+
+fn handle_metrics(mut stream: TcpStream, registry: &Registry) {
+    let encoder = TextEncoder::new();
+    let metric_families = registry.gather();
+    let mut buffer = Vec::new();
+    encoder.encode(&metric_families, &mut buffer).unwrap();
+    stream.write_all(&buffer).unwrap();
 }
