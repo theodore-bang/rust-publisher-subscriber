@@ -74,17 +74,19 @@ fn main() -> io::Result<()> {
 // if the client expects a response, the server might not be able to provide one.
 // The client should probably implement some timeout error.
 */
-fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io::Result<()> {
+fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) {
     // Buffer to hold bytes from request //
     // Todo: change this to a BufReader...
     // ...though I had problems with that before.
     let mut buffer: [u8; 512] = [0; 512];
     
     // Read data from the client as bytes //
-    let bytes_read = stream.read(&mut buffer)?;
+    let Ok(bytes_read) = stream.read(&mut buffer)
+        else { return () };
     
     // Deserialize the bytes back into a Stub //
-    let received = serde_json::from_slice::<Stub>(&buffer[..bytes_read]).unwrap();
+    let Ok(received) = serde_json::from_slice::<Stub>(&buffer[..bytes_read])
+    else { return () };
     println!("Server: received request \"{:?}\"", received);
 
     // Handle client's request //
@@ -140,9 +142,9 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) -> io:
 
             // Send messages back to Client //
             /* Todo: as mentioned, need to do better error handling. */
-            stream.write_all(response.as_bytes())?;
+            let _ = stream.write_all(response.as_bytes());
         }
     }
     
-    Ok(())
+    // Ok(())
 }

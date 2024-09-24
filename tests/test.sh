@@ -1,3 +1,11 @@
 #!/usr/bin/env sh
 
-timeout 3s ./tests/pingpong1.sh
+./target/debug/server &
+
+while true; do 
+	timeout 5s sleep 5 &
+done &
+
+sleep 10
+
+pkill -P $$

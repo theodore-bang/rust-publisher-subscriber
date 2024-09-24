@@ -1,9 +1,10 @@
 use sub_api;
 
 fn main() {
-    let topic1 = "My First Topic".to_string();
-    let topic2 = "My Second Topic".to_string();
+    let topic1 = "My First Topic";
+    let topic2 = "My Second Topic";
 
+    // Register //
     let sid = sub_api::register_subscriber().unwrap();
 
     // Wait for publisher to publish topics and messages //
@@ -15,16 +16,14 @@ fn main() {
 
     // Print messages from first topic //
     let my_msgs = sub_api::pull(sid, &topic1);
-    println!("From topic 1:");
     for msg in my_msgs {
-        println!("Message received: {}", msg);
+        println!("Subscriber: message received: {}", msg);
     }
 
     // Try getting messages from second topic //
     let my_msgs = sub_api::pull(sid, &topic2);
-    println!("From topic 2:");
     for msg in my_msgs {
-        println!("Message received: {}", msg);
+        println!("Subscriber: message received: {}", msg);
     }
 
 }

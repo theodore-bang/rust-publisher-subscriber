@@ -21,9 +21,9 @@ fn main() {
     
 
     loop {
-        let msgs = sub_api::pull(sid, &other_topic);
+        let _msgs = sub_api::pull(sid, &other_topic);
 
-        println!("SID {sid} received: {:?}", msgs);
+        // println!("SID {sid} received: {:?}", msgs);
 
         pub_api::send(pid, &my_topic, &message);
     }

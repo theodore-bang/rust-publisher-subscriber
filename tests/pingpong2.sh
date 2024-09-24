@@ -1,6 +1,27 @@
 #!/usr/bin/env sh
 
-command="echo -e "hi" & echo -e "he" & echo -e "wo""
+timeout 20s ./target/debug/server > ./tests/pingpong2server.txt &
 
-timeout 1s $command --fore-ground
+sleep 1
 
+timeout 15s ./target/debug/ping & 
+timeout 15s ./target/debug/pong &
+
+sleep 1
+
+timeout 15s ./target/debug/ping & 
+timeout 15s ./target/debug/pong &
+
+sleep 1
+
+timeout 15s ./target/debug/ping & 
+timeout 15s ./target/debug/pong &
+
+sleep 1
+
+timeout 15s ./target/debug/ping & 
+timeout 15s ./target/debug/pong &
+
+sleep 20s
+echo "Done!"
+pkill -P $$
