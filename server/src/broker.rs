@@ -162,6 +162,8 @@ impl Topic {
             }
             message.not_seen.retain(|&a_sid| a_sid != sid );
         }
+
+        self.messages.retain(|msg| !msg.not_seen.is_empty() );
         
         output
     }

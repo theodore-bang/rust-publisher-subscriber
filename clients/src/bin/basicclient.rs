@@ -1,66 +1,34 @@
-use pub_api;
-use sub_api;
+use pub_api::*;
+use sub_api::*;
 
 fn main() {
-    let pid = pub_api::register_publisher().unwrap();
-    println!("Registered PID: {}", pid);
-    let pid = pub_api::register_publisher().unwrap();
-    println!("Registered PID: {}", pid);
-    let pid = pub_api::register_publisher().unwrap();
-    println!("Registered PID: {}", pid);
-
-    let topic1 = "My First Topic".to_string();
-    let topic2 = "My Second Topic".to_string();
+    let first_topic = "FIRST TOPIC";
+    let second_topic = "SECOND TOPIC";
+    let changed_owner = "TOPIC CHANGED OWNER";
+    let deleted_topic = "DELETED TOPIC";
     
-    let message1 = "My first message!".to_string();
-    let message2 = "My second message!".to_string();
-    let message3 = "My third message!".to_string();
-    let message4 = "My fourth message!".to_string();
+    // Test we can registers subs and pubs //
+    let pub1 = register_publisher().unwrap();
+    let pub2 = register_publisher().unwrap();
+    let sub1 = register_subscriber().unwrap();
+    let sub2 = register_subscriber().unwrap();
 
-    pub_api::create_topic(pid, &topic1);
+    // Test pubs can create topics and delete topics
+    create_topic(pub1, &first_topic);
 
-    pub_api::create_topic(pid, &topic2);
-    pub_api::send(pid, &topic2, &message1);
-    pub_api::send(pid, &topic2, &message2);
-    pub_api::send(pid, &topic2, &message3);
+    // Test that subs can subscribe to topics
 
-    let sid = sub_api::register_subscriber().unwrap();
-    println!("Registered SID: {}", sid);
-    let sid = sub_api::register_subscriber().unwrap();
-    println!("Registered SID: {}", sid);
-    let sid = sub_api::register_subscriber().unwrap();
-    println!("Registered SID: {}", sid);
+    // Test that pubs can send messages
+    
+    // Test that subs can pull messages
 
-    // Subscribe to first topic //
-    sub_api::subscribe(sid, &topic1);
-    sub_api::subscribe(sid, &topic2);
+    // Test that pubs can send new messages
 
-    pub_api::send(pid, &topic1, &message1);
-    pub_api::send(pid, &topic2, &message1);
-    pub_api::send(pid, &topic2, &message2);
+    // Test that subs can pull new messages
 
-    // Print messages from first topic //
-    let my_msgs = sub_api::pull(sid, &topic1);
-    println!("From topic 1:");
-    for msg in my_msgs {
-        println!("Message received: {}", msg);
-    }
+    // Test that sub will get messages other subs saw
 
-    // Try getting messages from second topic //
-    let my_msgs = sub_api::pull(sid, &topic2);
-    println!("From topic 2:");
-    for msg in my_msgs {
-        println!("Message received: {}", msg);
-    }
+    // Subs get empty messages from invalid topics, or if no new messages
 
-    pub_api::send(pid, &topic1, &message3);
 
-    // Print messages from first topic //
-    let my_msgs = sub_api::pull(sid, &topic1);
-    println!("From topic 1:");
-    for msg in my_msgs {
-        println!("Message received: {}", msg);
-    }
-
-    pub_api::send(pid, &topic1, &message4);
 }
