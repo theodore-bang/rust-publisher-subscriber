@@ -2,7 +2,6 @@
 
 use common::{Messages, Procedures, Sid, Stub, try_connect};
 use std::io::{BufReader, Write};
-use serde_json;
 // use std::net::TcpStream;
 
 
@@ -40,7 +39,7 @@ pub fn subscribe(sid: Sid, topic: &str) {
     // Try connecting to Server //
     /* if connection fails at any point, do nothing */
     let Ok(mut stream) = try_connect()
-        else {return ()};
+        else {return };
 
     // The Request //
     let rpc = Stub {

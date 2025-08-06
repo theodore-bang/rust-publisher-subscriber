@@ -26,7 +26,6 @@ use std::io::{self, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, RwLock};
 use std::thread;
-use serde_json;
 
 use std::time::{Duration, Instant};
 use prometheus::{Encoder, TextEncoder, IntCounter, IntGauge, Registry};
@@ -88,7 +87,7 @@ fn main() -> io::Result<()> {
 
     // Bind the server to a local address and port //
     let listener = TcpListener::bind(ADDR)?;
-    println!("Server: listening at {}", ADDR);
+    println!("Server: listening at {ADDR}");
 
     // Accept connections in a loop //
     for stream in listener.incoming() {
@@ -102,7 +101,7 @@ fn main() -> io::Result<()> {
                 thread::spawn(move || handle_client(ref_to_server, stream));
             }
             Err(e) => {
-                eprintln!("Server: connection failed: {}", e);
+                eprintln!("Server: connection failed: {e}");
             }
         }
     }
@@ -131,12 +130,12 @@ fn handle_client(server_data: Arc<RwLock<Broker>>, mut stream: TcpStream) {
     
     // Read data from the client as bytes //
     let Ok(bytes_read) = stream.read(&mut buffer)
-        else { return () };
+        else { return  };
     
     // Deserialize the bytes back into a Stub //
     let Ok(received) = serde_json::from_slice::<Stub>(&buffer[..bytes_read])
-    else { return () };
-    println!("Server: received request \"{:?}\"", received);
+    else { return  };
+    println!("Server: received request \"{received:?}\"");
 
     // Handle client's request //
     /*

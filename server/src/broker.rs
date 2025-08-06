@@ -48,13 +48,13 @@ impl Broker {
     pub fn register_sub(&mut self) -> Sid {
         let new_sid: u64 = rand::thread_rng().gen();
         self.sub_list.push(new_sid);
-        println!("Server: registering SID {}", new_sid);
+        println!("Server: registering SID {new_sid}");
         new_sid
     }
     pub fn register_pub(&mut self) -> Pid {
         let new_pid: u64 = rand::thread_rng().gen();
         self.pub_list.push(new_pid);
-        println!("Server: registering SID {}", new_pid);
+        println!("Server: registering SID {new_pid}");
         new_pid
     }
 
@@ -62,7 +62,7 @@ impl Broker {
         // If pid is not of registered Publisher, do nothing //
         if !self.check_pid(pid) {
             println!("Server: {} is not a publisher! {:?}", pid, self.pub_list);
-            return ();
+            return ;
         }
         if !self.topics.contains_key(&topic_name) {
             let new_topic = Topic {
@@ -73,7 +73,7 @@ impl Broker {
             };
 
             self.topics.insert(topic_name.clone(), new_topic);
-            println!("Server: created topic \"{}\"", topic_name);
+            println!("Server: created topic \"{topic_name}\"");
         }
     }
 
@@ -81,32 +81,32 @@ impl Broker {
         // If topic is not found, do nothing //
         let Some(found) = self.topics.get(&topic_name) else {
             println!("Server: topic not found");
-            return () 
+            return  
         };
 
         // If pid is not that of Topic's creator, do nothing //
         if found.publisher == pid {
             self.topics.remove(&topic_name);
-            println!("Server: deleted topic \"{}\"", topic_name);
+            println!("Server: deleted topic \"{topic_name}\"");
         }
     }
 
     pub fn add_message(&mut self, pid: Pid, topic_name: String, content: String) {
         // If pid is not of registered Publisher, do nothing //
         if !self.check_pid(pid) {
-            return ();
+            return ;
         }
-        let Some(topic) = self.topics.get_mut(&topic_name) else {return ()};
+        let Some(topic) = self.topics.get_mut(&topic_name) else {return };
         topic.new_message(content);
-        println!("Server: added message to topic: {}", topic_name);
+        println!("Server: added message to topic: {topic_name}");
     }
 
     pub fn subscribe(&mut self, sid: Sid, topic_name: String) {
         // If sid is not of registered Subscriber, do nothing //
         if !self.check_sid(sid) {
-            return ();
+            return ;
         }
-        let Some(found) = self.topics.get_mut(&topic_name) else {return ()};
+        let Some(found) = self.topics.get_mut(&topic_name) else {return };
         found.subscribe(sid);
     }
 
@@ -118,7 +118,7 @@ impl Broker {
         // println!("Pulling \"{}\" messages for {}", topic_name, sid);
         if let Some(topic) = self.topics.get_mut(&topic_name) {
             println!("Server: pulling {} messages for {sid}", &topic.topic_name);
-            return topic.get_messages(sid);
+            topic.get_messages(sid)
         } else {
             println!("Server: failed to find topic");
             vec![]

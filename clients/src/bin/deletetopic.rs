@@ -6,6 +6,6 @@ fn main() {
     let topic = "A Topic Name of 20B!";
 
     loop {
-        delete_topic(pid, &topic);
+        delete_topic(pid, topic);
     }
 }

@@ -2,7 +2,6 @@
 
 use common::{Pid, Procedures, Stub, try_connect};
 use std::io::{BufReader, Write};
-use serde_json;
 
 pub fn register_publisher() -> Option<Pid> {
     // Try connecting to Server //
@@ -37,7 +36,7 @@ pub fn create_topic(pid: Pid, topic: &str) {
     // Try connecting to Server //
     /* if it fails, do nothing */
     let Ok(mut stream) = try_connect()
-    else {return ()};
+    else {return };
 
     // The Request //
     let rpc = Stub {
@@ -57,7 +56,7 @@ pub fn delete_topic(pid: Pid, topic: &str) {
     // Try connecting to Server //
     /* if it fails, do nothing */
     let Ok(mut stream) = try_connect()
-    else {return ()};
+    else {return };
 
     // The Request //
     let rpc = Stub {
@@ -77,7 +76,7 @@ pub fn send(pid: Pid, topic: &str, message: &str) {
     // Try connecting to Server //
     /* if it fails, do nothing */
     let Ok(mut stream) = try_connect()
-    else {return ()};
+    else {return };
 
     // The Request //
     let rpc = Stub {

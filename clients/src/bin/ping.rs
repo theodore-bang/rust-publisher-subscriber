@@ -1,5 +1,3 @@
-use sub_api;
-use pub_api;
 
 fn main() {
     let my_topic = "ping".to_string();

@@ -11,13 +11,13 @@ fn main() {
 
     sleep(1);
 
-    subscribe(sub1, &first_topic);
-    subscribe(sub1, &second_topic);
+    subscribe(sub1, first_topic);
+    subscribe(sub1, second_topic);
 
     sleep(1);
     
-    let sub1_msgs1 = pull(sub1, &first_topic);
-    let sub1_msgs2 = pull(sub1, &second_topic);
+    let sub1_msgs1 = pull(sub1, first_topic);
+    let sub1_msgs2 = pull(sub1, second_topic);
 
     for msg in sub1_msgs1 {
         println!("{sub1} received: {msg} from {first_topic}");
@@ -29,7 +29,7 @@ fn main() {
     println!("{sub1} waiting...");
     sleep(1);
 
-    let sub1_msgs1 = pull(sub1, &first_topic);
+    let sub1_msgs1 = pull(sub1, first_topic);
 
     for msg in sub1_msgs1 {
         println!("{sub1} received: {msg} from {first_topic}");

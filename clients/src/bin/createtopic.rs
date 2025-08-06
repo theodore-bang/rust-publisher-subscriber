@@ -6,6 +6,6 @@ fn main() {
     let topic = "A Topic Name of 20B!";
 
     loop {
-        create_topic(pid, &topic);
+        create_topic(pid, topic);
     }
 }
